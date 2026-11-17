@@ -102,6 +102,7 @@ check("一行の式の途中にコメント // を足さない（行の残りが
 check("言い方：「安全です」「必ず晴れ」などと言い切らない", !/安全です|安心です|必ず晴れ|絶対に降らない/.test(html + readme));
 check("言い方：「このゲームについて」に、公式の情報の代わりではないこと・架空であること・本当の情報を見る所がある", /気象の公式の情報の代わりではありません/.test(html) && /架空/.test(html) && /気象庁の発表で確かめて/.test(html) && /気象庁/.test(html) && /代わりではありません/.test(readme));
 check("写し元（噴火警戒レベルよみ・健康情報みぬき）の言葉が残っていない（game-dev.md A 手順5）", !/噴火|火山|火口|登山|避難|架空の山|レベル|健康|みぬき|根拠なし|医師|薬剤師|188|商品|サプリ|なぜあやしい/.test(html + gen + readme));
+check("知らせ（.toast）は下のボタンを押すじゃまをしない（pointer-events:none。shared-workflows drift-check）", /\.toast\{[^}]*pointer-events:none/.test(html));
 check("画面にお笑いの言葉を入れない（本物っぽく）", !/お笑い|ギャグ|ツッコミ|なんでやねん|（うそ）/.test(html + gen));
 check("引き継ぎ：transfer.js をゲームの script より前に、このゲームの記録のキー（記録・文字・復習）だけで読む・depth.js も前に読む", /<script src="transfer\.js" data-game="yohou-kotoba" data-keys="yhk-v1,yhk-fs,yhk-depth"><\/script>\s*<script src="depth\.js" data-game="yohou-kotoba" data-key="yhk-depth"><\/script>\s*<\/head>/.test(html) && html.indexOf('src="transfer.js"') < html.indexOf('src="data.js"') && /data-hk/.test(html) && existsSync(path.join(root, "transfer.js")));
 check("好きなだけ遊べる：チケット・回数の上限・🔒で開くモードを入れない（game-dev.md F1・F2）", !/🎫|チケット|すると開く|🔒/.test(html) && !/\blife\b|ELIFE/.test(html));
