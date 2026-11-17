@@ -1,0 +1,21 @@
+{
+  "name": "予報ことばよみ",
+  "short_name": "予報ことば",
+  "description": "天気予報のことばの意味を選ぶ1日5問",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#e6eff6",
+  "theme_color": "#e6eff6",
+  "icons": [
+    { "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    { "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
