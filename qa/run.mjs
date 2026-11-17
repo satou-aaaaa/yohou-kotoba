@@ -24,6 +24,8 @@ const TOKI = { 未明: [0, 3], 明け方: [3, 6], 朝: [6, 9], 昼前: [9, 12], 
 const AME = { 弱い雨: [0, 3], やや強い雨: [10, 20], 強い雨: [20, 30], 激しい雨: [30, 50], 非常に激しい雨: [50, 80], 猛烈な雨: [80, null] };
 const KAZE = { やや強い風: [10, 15], 強い風: [15, 20], 非常に強い風: [20, 30], 猛烈な風: [30, null] };
 const KION = { 冬日: ["最低", "0度未満"], 真冬日: ["最高", "0度未満"], 夏日: ["最高", "25度以上"], 真夏日: ["最高", "30度以上"], 猛暑日: ["最高", "35度以上"], 熱帯夜: ["最低", "25度以上"] };
+// 気象庁「雨の強さと降り方」の「人の受けるイメージ」（data.js とは別に書いた表）
+const AMEHYO = { ザーザーと降る: "やや強い雨", どしゃ降り: "強い雨", バケツをひっくり返したように降る: "激しい雨", "滝のように降る（ゴーゴーと降り続く）": "非常に激しい雨", 息苦しくなるような圧迫感がある: "猛烈な雨", 恐怖を感じる: "猛烈な雨" };
 const NICHU = { 日中: "9時〜18時", 昼頃: "11時〜13時", 朝晩: "0時〜9時ごろと18時〜24時" };
 const KAWARI = { 一時: /続けて.*4分の1より短い/, 時々: /とぎれとぎれ.*半分より短い/, のち: /前と後で.*変わる/ };
 const rangeTxt = (u, [a, b]) => (b === null ? new RegExp(`${a}${u}以上`) : a === 0 ? new RegExp(`${b}${u}未満`) : new RegExp(`${a}${u}以上${b}${u}未満`));
@@ -50,7 +52,7 @@ const kumoAns = (n, up) => (n <= 1 ? "快晴" : n <= 8 ? "晴れ" : up ? "薄曇
         if (!(lo < hi)) why.push("最低が最高より高い");
         const truth = P.opts.filter((o) => (o === "どれにもあたらない" ? !Object.values(t).some(Boolean) : t[o]));
         if (truth.length !== 1 || truth[0] !== P.ans) why.push("気温から呼び名：あてはまる選び肢が1つでない"); }
-      if (k.id === "amehyo") { const f = w(/「([^」]+)」/); if (!(G.AMEHYO[P.ans] || []).includes(f) || Object.keys(G.AMEHYO).filter((x) => G.AMEHYO[x].includes(f)).length !== 1) why.push("降り方とことばが資料の表とちがう"); }
+      if (k.id === "amehyo") { const f = w(/「([^」]+)」/); if (AMEHYO[f] !== P.ans) why.push("降り方とことばが資料の表とちがう"); }
       if (k.id === "kaku2" && !/わからない|かぎらない/.test(P.ans)) why.push("降水確率は量を示さない");
       if (!G.GROUPS[P.grp]) why.push("2段目の分け方が無い");
       if (!P.src.length || P.src.some((x) => !Array.isArray(x) || !/^https:\/\//.test(x[1]))) why.push("出典が無い");
@@ -474,6 +476,7 @@ try {
 // 2段目の分け方：どの種類にもある（3つのどれか）
 { const q = await newPage(); await closeHow(q);
   check("保存に失敗したら、保存できるまで帯（#savewarn）で知らせ続け、保存できたら消す", await q.evaluate(async () => { const orig = Storage.prototype.setItem; Storage.prototype.setItem = function () { throw new Error("full"); }; __km.save(() => {}); __km.save(() => {}); const one = document.querySelectorAll("#savewarn").length === 1 && document.getElementById("savewarn").textContent.includes("保存できませんでした"); await new Promise((r) => setTimeout(r, 1500)); const stay = !!document.getElementById("savewarn"); Storage.prototype.setItem = orig; __km.save(() => {}); return one && stay && !document.getElementById("savewarn"); }));
+  check("保存に失敗したあいだに終えたとことんは、古い保存の続きで戻らない（yohou-kotoba #1 の CodeRabbit）", await q.evaluate(() => { __km.save((s) => { s.runs.e = { mode: "e", id: "old", date: __km.todayKey(), list: ["toki|1", "ame|1"], res: [{ m: 0 }], cur: null }; }); const orig = Storage.prototype.setItem; Storage.prototype.setItem = function () { throw new Error("full"); }; let ok; try { __km.save((s) => { s.runs.e = null; }); ok = __km.load().runs.e === null; } finally { Storage.prototype.setItem = orig; } __km.save((s) => { s.runs.e = null; }); return ok && __km.load().runs.e === null; }));
   await q.evaluate(() => __km.start("e")); await q.waitForTimeout(100);
   await q.click(`.ch[data-j="${await ansIdx(q)}"]`); await why(q); await q.waitForSelector(".verdict");
   await q.click("#quit"); await q.waitForTimeout(150);
