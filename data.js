@@ -129,7 +129,7 @@
       why: "気象庁の表では、やや強い雨はザーザー、強い雨はどしゃ降り、激しい雨はバケツをひっくり返したよう、非常に激しい雨は滝のように降ります。",
       make: (R) => {
         const ws = Object.keys(AMEHYO), m = pick(R, TOWNS), w = pick(R, ws), fi = ri(R, 0, AMEHYO[w].length - 1), qi = ri(R, 0, 1), f = AMEHYO[w][fi];
-        const q = [`${m}で「${f}」ような雨。予報ではどう言う？`, `「${f}」くらいの雨は、予報のことばで？`][qi];
+        const q = [`${m}で「${f}」${/[るい）]$/.test(f) ? "" : "の"}ような雨。予報ではどう言う？`, `「${f}」くらいの雨は、予報のことばで？`][qi];
         const pool = ws.concat(["弱い雨"]).filter((x) => x !== w);
         return { q, opts: shuffle(R, [w, ...pickN(R, pool, 3)]), ans: w, v: `${TOWNS.indexOf(m)}:${ws.indexOf(w)}:${fi}:${qi}` };
       } },
